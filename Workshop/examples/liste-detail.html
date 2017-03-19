@@ -1,0 +1,258 @@
+<html>
+<head>
+    <style type="text/css">
+        div {
+            border: solid black 1px;
+            display: inline-block;
+            padding: 10px;
+            margin: 10px;
+            font-size: 1.3em;
+        }
+
+        .selected {
+            color:blue;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        .image {
+            width: 100px; 
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body> 
+
+    <div id="root"></div>
+    <script type="text/javascript" src="../react/react.js"></script> 
+    <script type="text/javascript" src="../react/JSXTransformer.js"></script>
+    <script type="text/javascript">
+	
+		//Tableau contenant uniquement les citations pour faciliter la fonction plusieurs clique pour une seule image pour Yoda et Darth Vader
+        //Les 4 citations de Yoda sont placées en première position suivies des 2 citations de Darth Vador pour me faciliter pour les fonctions multiple cliques
+		var quotes = ['When 900 years old, you reach… Look as good, you will not', 'Mmm. Lost a planet, Master Obi-Wan has. How embarrassing.', 'Do. Or do not. There is no try.', 'If once you start down the dark side, forever will it dominate your destiney, consume you it will, as it did Obi-Wan\'s apprentice', 'Luke, you can destroy the Emperor. He has foreseen this. It is your destiny. Join me, and together we can rule the galaxy as father and son.','The Force is strong with this one.','The Dark Side of the Force is the pathway to many abilities some consider to be.. Unnatural.', 'I sense great fear in you, Skywalker. You have hate… you have anger… but you don’t use them.','Aren\'t you a little short for a storm trooper?','Your focus determines your reality','In my experience there is no such thing as luck.','In my experience there is no such thing as luck.'];
+	
+		
+        //Variable letters qui contient le noms des personnages ainsi que leurs phrases favorites
+        //J'ai enlevé les Yoda et Darth Vador multiples
+        var letters = [{ 
+            'author': 'Yoda',
+            'quote': 'When 900 years old, you reach… Look as good, you will not.',
+          }, {
+            'author': 'Senator palpatine',
+            'quote': 'The Dark Side of the Force is the pathway to many abilities some consider to be.. Unnatural.'
+          }, {
+            'author': 'Count Dooku',
+            'quote': 'I sense great fear in you, Skywalker. You have hate… you have anger… but you don’t use them.'
+          }, {
+            'author': 'Darth vader',
+            'quote': 'Luke, you can destroy the Emperor. He has foreseen this. It is your destiny. Join me, and together we can rule the galaxy as father and son.'
+          }, {
+            'author': 'Princess leila',
+            'quote': 'Aren\'t you a little short for a storm trooper?'
+          }, {
+            'author': 'Qui-Gon Jinn',
+            'quote': 'Your focus determines your reality'
+          }, {
+            'author': 'Obi-Wan-Kenobi',
+            'quote': 'In my experience there is no such thing as luck.'
+          }, {
+            'author': 'Aleatoire',
+            'quote': ''
+          }
+		];
+
+        //Fonction pour générer une chaîne aléatoire
+        function ChaineA(nbcar)
+        {
+            var ListeCar = new Array("a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"); // Liste de caractères
+            var Chaine ='';
+            for(i = 0; i < nbcar; i++)
+            {
+                Chaine = Chaine + ListeCar[Math.floor(Math.random()*ListeCar.length)];
+            }
+        return Chaine;
+        }
+
+    </script>
+
+    <script type="text/jsx">
+
+    var Tree =  React.createClass({
+        render : function () {
+            return (<div>
+                <h1> Star Wars </h1>
+                <h2> Premiere Realisation : Mettre une image pour les personnages </h2>
+                <h2> Deuxième Realisation : Faire un clique multiple pour la photo de Yoda et de Darth Vador </h2>
+                <h2> Troisieme Realisation : Mettre une image pour laquelle un appui dessus genere une citation aleatoirement </h2>
+                <h2> Quatrieme Realisation : Lorsque un utilisateur clique sur une citation, un pop-up saffiche avec le nom de lauteur </h2> 
+                <h2> Cinquieme Realisation : Generation dune chaîne aleatoire </h2> 
+                <Letters onLetterSelected={this.selectLetter}/>
+                <Score letter={this.state.letter}/>
+                <AleatoireChaine letter={this.state.letter}/>
+            </div>);
+        },
+
+        getInitialState : function() {
+            return{
+                letter : ''
+            }
+        },
+
+        selectLetter : function (newLetter) {
+            return this.setState({letter : newLetter});
+        }
+    });
+	
+	
+    var counterYoda = 0; //Variable qui va compter le nombre de clique pour Yoda
+    var counterVador = 4; //Variable qui va compter le nombre de clique pour Darth Vador, je commence a 4 car dans mon tableau quotes les citation de Vador sont a la position 4 et 5 (tableau commençant a 0)
+	var randnumber = 0; //Variable pour l'affichage des citations aléatoires.
+    var motAleatoire = '';
+	
+    var Letters = React.createClass({
+
+        render : function () {
+            var handler = this.props.onLetterSelected;
+
+            return (<div>
+                {letters.map(function(item) {
+                    return <Letter itemValue={item} whenClick={handler} />;
+                })}
+            </div>);
+        },
+
+    });
+
+    var Letter = React.createClass({
+
+        render : function () {
+            var classname = this.state.selected ? 'selected' : '';
+            return (<div className={classname} onClick={this.handleClick}><img className="image" src={"images/" + this.props.itemValue.author + ".jpg"} /></div>);
+            //J'ai choisi de faire une balise image qui a pour source les images que j'ai télécharge a partir d'internet et mis dans mon dossier Image
+            //Pour pouvoir afficher le nom des personnage a la fin des citations et pour pas que le nom s'affiche avec un .jpg a la fin j'ai tronqué le nom. 
+            //Cela a pour seul inconvénient de récupérer que des images en .jpg
+        },
+		
+
+        getInitialState : function () {
+            return {selected : false };
+        },
+
+        handleClick : function () {
+			
+			//Si l'utilisateur clique sur Yoda
+            if(this.props.itemValue.author == "Yoda") {
+				counterYoda++; //On incrémente la variable a chaque clique sur Yoda
+				if (counterYoda > 4) { //Il n'y a que 4 citations de Yoda donc au bout du 4e clique, il repart sur la première citation de Yoda
+					counterYoda = 1; //On revient a la première citation de Yoda
+				}
+			}
+            
+            //Si l'utilisateur clique sur Darth Vador
+            else if(this.props.itemValue.author == "Darth vader") {
+                counterVador++; //On incrémente la variable a chaque clique sur D
+                if (counterVador > 5) { //Il n'y a que 2 citations de Darth Vador donc au bout du 2e clique, il repart sur la première citation de Darth Vador
+                    counterVador = 4; //On revient a la première citation de Yoda
+                }
+            }
+            
+            //Si l'utilisateur clique sur Aleatoire, il cherche un citation random
+			else if(this.props.itemValue.author == "Aleatoire") {
+				randnumber = Math.floor((Math.random() * quotes.length) + 0); //On génère un nombre aléatoire qui sera ensuite utiliser comme index pour quotes
+			}
+
+			motAleatoire = ChaineA(20); //On génère une chaîne aléatoire de 20 caractères
+            this.props.whenClick(this.props.itemValue); //On affiche le résultat
+            this.setState({selected : true});
+        }
+    });
+	
+    var Score = React.createClass({
+
+        render : function () {
+			
+            //Si l'utilisateur clique sur Yoda
+            if(this.props.letter.author == "Yoda") {
+				this.props.letter.quote = quotes[counterYoda - 1]; //On va chercher les citation de Yoda dans le tableau quotes
+			}
+            
+            //Si l'utilisateur clique sur Darth Vador
+            if(this.props.letter.author == "Darth vader") {
+                this.props.letter.quote = quotes[counterVador - 1]; //On va chercher les citation de Darth Vador dans le tableau quotes
+            }
+            
+            //Si l'utilisateur clique sur Aleatoire
+			else if(this.props.letter.author == "Aleatoire") {
+				this.props.letter.quote = quotes[randnumber]; //On choisit une citation au hasard
+			}
+			
+		    //On affiche la citation suivie de son auteur. Si c'est une citation aléatoire, l'auteur affiché est l'auteur aléatoire
+            return (<div  onClick={this.handleClick}>
+                 {this.props.letter.quote} - {this.props.letter.author}
+            </div>);
+        },
+		
+		handleClick : function ()
+        {	
+			//Malheuresement, j'ai tenté une boucle for mais sans connaître la raison cela ne fonctionnait pas donc j'ai opté pour un switch case
+            //Cette fonction permet quand on appuit sur une citation, un pop-up affiche l'auteur de la citation sélectionné
+            switch (this.props.letter.quote)
+            {
+				case letters[1].quote: // Si l'auteur est Yoda
+					alert("L'auteur de cette citation est "+ letters[1].author);
+					break;
+				case letters[2].quote: // Si l'auteur est Senator palpatine
+					alert("L'auteur de cette citation est "+ letters[2].author);
+					break;
+				case letters[3].quote: // Si l'auteur est Count Dooku
+					alert("L'auteur de cette citation est "+ letters[3].author);
+					break;
+				case letters[4].quote: // Si l'auteur est Darth vader
+					alert("L'auteur de cette citation est "+ letters[4].author);
+					break;
+				case letters[5].quote: // Si l'auteur est Princess leila
+					alert("L'auteur de cette citation est "+ letters[5].author);
+					break;
+				case letters[6].quote: // Si l'auteur est Qui-Gon Jinn
+					alert("L'auteur de cette citation est "+ letters[6].author);
+					break;
+				case letters[7].quote: // Si l'auteur est Obi-Wan-Kenobi
+					alert("L'auteur de cette citation est "+ letters[7].author);
+					break;
+                case quotes[5]: // Si la citation de darth Vador non présente dans letters mais dans quotes est sélectionné
+                    alert("L'auteur de cette citation est Darth vader");
+				case quotes[0]:
+                    alert("L'auteur de cette citation est Yoda");
+                default: // Si les citations de Yoda non présentes dans letters mais dans quotes sont sélectionnées
+					return;
+				break;
+			}	
+        }
+    });
+    
+    var AleatoireChaine = React.createClass({
+
+        render : function () {
+            
+            return (<div  onClick={this.handleClick}>
+                 Chaine aleatoire : {motAleatoire} 
+            </div>);
+        },
+        
+        handleClick : function () {   
+        }
+    });
+
+    React.render(<Tree />, document.getElementById('root'));
+
+    </script>
+</body>
+</html>
